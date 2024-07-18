@@ -16,6 +16,11 @@ import java.util.List;
 @RestController @RequiredArgsConstructor @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+    @PostMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<User>> fetchUsers() {
+        return ResponseEntity.ok(userService.getUsers());
+    }
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ROLE_ADMIN') ")
@@ -45,6 +50,13 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER') ")
 
     public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+    @PostMapping("/user/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') ")
+
+    public ResponseEntity<User> fetchUser(@PathVariable Long id) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
