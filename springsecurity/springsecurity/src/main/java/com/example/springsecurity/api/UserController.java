@@ -2,32 +2,32 @@ package com.example.springsecurity.api;
 
 import com.example.springsecurity.Domain.Role;
 import com.example.springsecurity.Domain.User;
+import com.example.springsecurity.repository.UserRepository;
 import com.example.springsecurity.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController @RequiredArgsConstructor @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+    private UserRepository userRepository;
+
     @PostMapping("/users")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+   // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<User>> fetchUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @GetMapping("/users")
-    @PreAuthorize("hasRole('ROLE_ADMIN') ")
 
-    public ResponseEntity<List<User>> getUsers() {
-        return ResponseEntity.ok(userService.getUsers());
-    }
     @PostMapping("/user/save")
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
@@ -45,16 +45,13 @@ public class UserController {
 
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/user/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') ")
-
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> fetchRoles() {
+        return ResponseEntity.ok(userService.getRoles());
     }
+
     @PostMapping("/user/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') ")
+  //  @PreAuthorize("hasRole('ROLE_USER') ")
 
     public ResponseEntity<User> fetchUser(@PathVariable Long id) {
         User user = userService.getUserById(id);
@@ -68,6 +65,21 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/user/deactivate/{id}")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+        userService.deactivateUser(id);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/user/me")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<User> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username);
+        return ResponseEntity.ok(user);
     }
 }
 @Data

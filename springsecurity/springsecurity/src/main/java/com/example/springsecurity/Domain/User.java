@@ -25,6 +25,10 @@ public class User implements UserDetails {
     private String name;
     private String username;
     private String password;
+    private boolean active;
+    private String email;
+    private String phone;
+    private String address;
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles=new ArrayList<>();
 
@@ -33,6 +37,10 @@ public class User implements UserDetails {
         return null;
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.active = true;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
@@ -52,4 +60,10 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+    public Long getId() {
+        return this.id;
+    }
+
+
+
 }

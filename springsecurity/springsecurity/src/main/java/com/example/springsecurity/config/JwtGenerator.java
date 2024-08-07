@@ -7,7 +7,9 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,27 +21,28 @@ public class JwtGenerator {
         String roles = authentication.getAuthorities().stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(","));
-        String token = Jwts.builder()
+
+        // Debugging: print the roles and token
+        System.out.println("Roles in JWT: " + roles);
+
+        return Jwts.builder()
                 .setSubject(username)
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET)
                 .compact();
-        System.out.println("New token :");
-        System.out.println(token);
-        return token;
     }
-    public String getRolesFromJwt(String token) {
+
+    public List<String> getRolesFromJwt(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(SecurityConstants.JWT_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
 
-        // Extract roles from the claims
-        String roles = claims.get("role", String.class); // Assuming "role" is the key for roles in JWT claims
-
-        return roles;
+        // Extract roles from the claims and split them
+        String roles = claims.get("roles", String.class); // Ensure the key matches
+        return roles != null ? Arrays.asList(roles.split(",")) : List.of();
     }
 
     public String getUsernameFromJwt(String token) {

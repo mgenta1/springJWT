@@ -21,19 +21,8 @@ public class SpringsecurityApplication {
 	@Bean
 	CommandLineRunner run (UserService userService) {
 	return args -> {
-		userService.saveRole(new Role(null, "ROLE_USER"));
-		userService.saveRole(new Role(null, "ROLE_ADMIN"));
 
-		userService.saveUser(new User(null, "walid", "walid", "$2a$12$5Gf.fiOcAxyam6BP1LHyRuy3k1G4fS5zByLRo1r5vYECGpG3vDMbC", new ArrayList<>()));
-		userService.saveUser(new User(null, "ahmed", "ahmed", "$2a$12$5Gf.fiOcAxyam6BP1LHyRuy3k1G4fS5zByLRo1r5vYECGpG3vDMbC", new ArrayList<>()));
-		userService.saveUser(new User(null, "ali", "ali", "$2a$12$5Gf.fiOcAxyam6BP1LHyRuy3k1G4fS5zByLRo1r5vYECGpG3vDMbC", new ArrayList<>()));
 
-		userService.addRoleToUser("walid", "ROLE_USER");
-
-		userService.addRoleToUser("ahmed", "ROLE_ADMIN");
-
-		userService.addRoleToUser("ali", "ROLE_ADMIN");
-		userService.addRoleToUser("ali", "ROLE_USER");
 
 	};
 }

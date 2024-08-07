@@ -53,10 +53,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/**").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(withDefaults());
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
